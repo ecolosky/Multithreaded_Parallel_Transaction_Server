@@ -1,0 +1,6 @@
+A = A + B + C + D + H + I + J + K + L + M + N + O + P + Q + R + S + T + U + V + W + X + Y + Z
+B = A + B + C + D + E + F + G + H + L + M + N + O + P + Q + R + S + T + U + V + W + X + Y + Z
+C = A + B + C + D + E + F + G + H + I + J + K + L + M + N + O + P + Q + R + S + T + U + V + W
+D = A + B + C + D + E + F + G + H + I + J + K + L + M + N + O + P + Q + R + S + T + W + X + Y + Z
+E = A + B + C + D + E + F + G + H + I + J + K + L + P + Q + R + S + T + U + V + W + X + Y + Z
+F = A + B + E + F + G + H + I + J + K + L + M + N + O + P + Q + R + S + T + U + V + W + X + Y + Z

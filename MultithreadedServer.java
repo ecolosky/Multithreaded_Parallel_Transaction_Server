@@ -22,7 +22,7 @@ class Task implements Runnable {
 	boolean[] written = new boolean[numLetters];
 	boolean[] read = new boolean[numLetters];
 	boolean[] originals = new boolean[numLetters];
-	boolean[] openAccts = new boolean[numLetters];
+	
 
 	private Account[] accounts;
 	private String transaction;
@@ -91,6 +91,8 @@ class Task implements Runnable {
 	}
 
 	public void run() {
+		boolean[] openAccts = new boolean[numLetters];
+		Arrays.fill(openAccts, false);
 		// tokenize transaction
 		String[] commands = transaction.split(";");
 		int i;
@@ -148,27 +150,34 @@ class Task implements Runnable {
 
 				}
 				// clear vals
-				Arrays.fill(openAccts, false);
+				for (int j = Z; j >= A; j--) {
+					openAccts[j] = false;
+				}
+//				Arrays.fill(openAccts, false);
 				continue;
 			}
 
 // ============================================================================================
 
 			try {
-				Arrays.fill(openAccts, false);
 				
 				// verify for loop
 				for (i = A; i <= Z; i++) {
-					if (read[i] == true)
+					if (read[i] == true){
 						accounts[i].verify(orgVals[i]);
+						openAccts[i] = true;
+					}
 				}// close verify loop
 			} catch (TransactionAbortException e) {
 				for (int j = Z; j >= A; j--) {
-					if (read[j] == true || written[j] == true)
+					if (openAccts[j] == true)
 						accounts[j].close();
 
 				}
-				Arrays.fill(originals, false);
+				for (int j = Z; j >= A; j--) {
+					openAccts[j] = false;
+				}
+//				Arrays.fill(openAccts, false);
 				continue;
 			}
 
@@ -177,9 +186,9 @@ class Task implements Runnable {
 			for (i = A; i <= Z; i++) {
 				if (written[i] == true) {
 					accounts[i].update(cacheVals[i]);
-					accounts[i].close();
+//					accounts[i].close();
 				}
-				if (read[i] == true) {
+				if (openAccts[i] == true) {
 					accounts[i].close();
 				}
 

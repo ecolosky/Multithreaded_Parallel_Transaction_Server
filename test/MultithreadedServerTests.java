@@ -43,7 +43,7 @@ public class MultithreadedServerTests extends TestCase {
 			accounts[i] = new Account(Z - i);
 		}
 
-		MultithreadedServer.runServer("src/hw09/data/increment", accounts);
+		MultithreadedServer.runServer("hw09/data/increment", accounts);
 
 		// assert correct account values
 		for (int i = A; i <= Z; i++) {
@@ -63,7 +63,7 @@ public class MultithreadedServerTests extends TestCase {
 			accounts[i] = new Account(Z - i);
 		}
 
-		MultithreadedServer.runServer("src/hw09/data/test02", accounts);
+		MultithreadedServer.runServer("hw09/data/test02", accounts);
 
 		// assert correct account values
 		assertEquals("Account A differs", 25, accounts[0].getValue());
@@ -71,6 +71,7 @@ public class MultithreadedServerTests extends TestCase {
 		assertEquals("Account C differs", 26, accounts[2].getValue());
 
 	}
+
 	@Test
 	public void test03() throws IOException {
 
@@ -83,7 +84,7 @@ public class MultithreadedServerTests extends TestCase {
 		accounts[11] = new Account(5);
 		accounts[16] = new Account(37);
 
-		MultithreadedServer.runServer("src/hw09/data/test03", accounts);
+		MultithreadedServer.runServer("hw09/data/test03", accounts);
 
 		// assert correct account values
 		assertEquals("Account A differs", 9, accounts[0].getValue());
@@ -92,8 +93,9 @@ public class MultithreadedServerTests extends TestCase {
 		assertEquals("Account J differs", 5, accounts[9].getValue());
 
 	}
+
 	@Test
-	public void testRotate() throws IOException {
+	public void test05() throws IOException {
 
 		// initialize accounts
 		accounts = new Account[numLetters];
@@ -101,16 +103,7 @@ public class MultithreadedServerTests extends TestCase {
 			accounts[i] = new Account(Z - i);
 		}
 
-		MultithreadedServer.runServer("src/hw09/data/rotate", accounts);
-
-		// assert correct account values
-		int start = 47;
-		for (int i = A; i <= 24; i++) {
-			Character c = new Character((char) (i + 'A'));
-			assertEquals("Account " + c + " differs",start,
-					accounts[i].getValue());
-			start -= 2;
-		}
+		MultithreadedServer.runServer("hw09/data/test05", accounts);
 
 	}
 
