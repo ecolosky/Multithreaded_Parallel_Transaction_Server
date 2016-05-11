@@ -40,7 +40,7 @@ public class MultithreadedServerTests extends TestCase {
 		// initialize accounts
 		accounts = new Account[numLetters];
 		for (int i = A; i <= Z; i++) {
-			accounts[i] = new Account(Z - i);
+			/* shared mutable state */ accounts[i] = new Account(Z - i);
 		}
 
 		MultithreadedServer.runServer("hw09/data/increment", accounts);
@@ -60,7 +60,7 @@ public class MultithreadedServerTests extends TestCase {
 		// initialize accounts
 		accounts = new Account[numLetters];
 		for (int i = A; i <= Z; i++) {
-			accounts[i] = new Account(Z - i);
+			/* shared mutable state */ accounts[i] = new Account(Z - i);
 		}
 
 		MultithreadedServer.runServer("hw09/data/test02", accounts);
@@ -77,12 +77,12 @@ public class MultithreadedServerTests extends TestCase {
 
 		// initialize accounts
 		accounts = new Account[numLetters];
-		accounts[0] = new Account(0);
-		accounts[1] = new Account(0);
-		accounts[5] = new Account(9);
-		accounts[9] = new Account(5);
-		accounts[11] = new Account(5);
-		accounts[16] = new Account(37);
+		/* shared mutable state */ accounts[0] = new Account(0);
+		/* shared mutable state */ accounts[1] = new Account(0);
+		/* shared mutable state */ accounts[5] = new Account(9);
+		/* shared mutable state */ accounts[9] = new Account(5);
+		/* shared mutable state */ accounts[11] = new Account(5);
+		/* shared mutable state */ accounts[16] = new Account(37);
 
 		MultithreadedServer.runServer("hw09/data/test03", accounts);
 
@@ -100,7 +100,7 @@ public class MultithreadedServerTests extends TestCase {
 		// initialize accounts
 		accounts = new Account[numLetters];
 		for (int i = A; i <= Z; i++) {
-			accounts[i] = new Account(Z - i);
+			/* shared mutable state */ accounts[i] = new Account(Z - i);
 		}
 
 		MultithreadedServer.runServer("hw09/data/test05", accounts);

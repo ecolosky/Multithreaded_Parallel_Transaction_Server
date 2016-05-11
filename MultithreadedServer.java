@@ -12,16 +12,18 @@ import java.util.concurrent.TimeUnit;
 // You will need to modify it to make it a task,
 // so it can be given to an Executor thread pool.
 //
+
+//"implements Runnable" turns class into task
 class Task implements Runnable {
 	private static final int A = constants.A;
 	private static final int Z = constants.Z;
 	private static final int numLetters = constants.numLetters;
 
-	int[] orgVals = new int[numLetters];
-	int[] cacheVals = new int[numLetters];
-	boolean[] written = new boolean[numLetters];
-	boolean[] read = new boolean[numLetters];
-	boolean[] originals = new boolean[numLetters];
+	int[] orgVals = new int[numLetters]; // stores original values
+	int[] cacheVals = new int[numLetters]; // stores cache values
+	boolean[] written = new boolean[numLetters]; //indicates account needs writing
+	boolean[] read = new boolean[numLetters]; // indicates account needs reading
+	boolean[] originals = new boolean[numLetters]; //marks if orgVals has already been updated
 	
 
 	private Account[] accounts;
@@ -45,18 +47,23 @@ class Task implements Runnable {
 	// You probably want to change it to return a reference to an
 	// account *cache* instead.
 	//
+	
+	// function returns an int to be updated in cacheVals instead of directly
+	// updating accounts
 	private int parseAccount(String name, boolean lhs) {
 		int rtn;
 		int accountNum = (int) (name.charAt(0)) - (int) 'A';
 		if (accountNum < A || accountNum > Z)
 			throw new InvalidTransactionError();
-
+		
+		// if no original value has been recorded; save to orgVals
 		if (originals[accountNum] == false) {
 			originals[accountNum] = true;
 			read[accountNum] = true;
 			orgVals[accountNum] = accounts[accountNum].peek();
 			cacheVals[accountNum] = orgVals[accountNum];
 		}
+		// lhs accounts need writing, not reading, can't be both
 		if (lhs == true){
 			read[accountNum] = false;
 			written[accountNum] = true;
@@ -68,6 +75,7 @@ class Task implements Runnable {
 				throw new InvalidTransactionError();
 			// all accounts peeked at must be opened for reading
 			accountNum = (cacheVals[accountNum] % numLetters);
+			// if no original value has been recorded; save to orgVals
 			if (originals[accountNum] == false) {
 				read[accountNum] = true;
 				originals[accountNum] = true;
@@ -124,9 +132,14 @@ class Task implements Runnable {
 				//
 			}// close of parse command loop
 // ========================================================================================
+			// clear orginals array - not needed
+			//					    - needed to be cleared if there's a reset
+			// failure will result in a reset (unlock all accounts)
 			Arrays.fill(originals, false);
+			
+			// try to open (lock) all accounts that need to be written/read
 			try {
-				// phase 1 of 2
+				// phase 1 of 2-phase commit
 				Arrays.fill(openAccts, false);
 				for (i = A; i <= Z; i++) {
 					// true means write
@@ -147,7 +160,6 @@ class Task implements Runnable {
 				for (int j = Z; j >= A; j--) {
 					if (openAccts[j] == true)
 						accounts[j].close();
-
 				}
 				// clear vals
 				for (int j = Z; j >= A; j--) {
@@ -158,7 +170,9 @@ class Task implements Runnable {
 			}
 
 // ============================================================================================
-
+			// verify that account values have not changed since orginally looked at
+			// failure will result in a reset (unlock all accounts)
+			// phase 1 of 2-phase commit
 			try {
 				
 				// verify for loop
@@ -182,7 +196,9 @@ class Task implements Runnable {
 			}
 
 // ================================================================================================
-			// update for loop
+			// loop through all accounts
+			// if an account needs writing, update its value
+			// make sure that any open account (reading or writing) is closed
 			for (i = A; i <= Z; i++) {
 				if (written[i] == true) {
 					accounts[i].update(cacheVals[i]);
@@ -216,13 +232,17 @@ public class MultithreadedServer {
 		// TO DO: you will need to create an Executor and then modify the
 		// following loop to feed tasks to the executor instead of running them
 		// directly.
+
+		// create Executor
 		ExecutorService pool = Executors.newCachedThreadPool();
 
+		// create a thread for every line in the input
 		while ((line = input.readLine()) != null) {
 			Task t = new Task(accounts, line);
 			pool.execute(t);
 		}
 		pool.shutdown();
+		// allow 60 sec for all threads to terminate
 		try {
 			pool.awaitTermination(60, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
