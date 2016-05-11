@@ -67,7 +67,7 @@ class Task implements Runnable {
 			if (name.charAt(i) != '*')
 				throw new InvalidTransactionError();
 			// all accounts peeked at must be opened for reading
-			accountNum = (accounts[accountNum].peek() % numLetters);
+			accountNum = (cacheVals[accountNum] % numLetters);
 			if (originals[accountNum] == false) {
 				read[accountNum] = true;
 				originals[accountNum] = true;
@@ -122,7 +122,7 @@ class Task implements Runnable {
 				//
 			}// close of parse command loop
 // ========================================================================================
-
+			Arrays.fill(originals, false);
 			try {
 				// phase 1 of 2
 				Arrays.fill(openAccts, false);
@@ -148,7 +148,6 @@ class Task implements Runnable {
 
 				}
 				// clear vals
-				Arrays.fill(originals, false);
 				Arrays.fill(openAccts, false);
 				continue;
 			}
@@ -157,6 +156,7 @@ class Task implements Runnable {
 
 			try {
 				Arrays.fill(openAccts, false);
+				
 				// verify for loop
 				for (i = A; i <= Z; i++) {
 					if (read[i] == true)
